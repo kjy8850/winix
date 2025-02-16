@@ -1,5 +1,3 @@
-"""Winix Air Purfier Air QValue Sensor."""
-
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -20,41 +18,30 @@ from homeassistant.helpers.typing import StateType
 
 from . import WINIX_DOMAIN
 from .const import (
-    ATTR_AIR_AQI,
-    ATTR_AIR_QUALITY,
-    ATTR_AIR_QVALUE,
-    ATTR_FILTER_HOUR,
-    SENSOR_AIR_QVALUE,
-    SENSOR_AQI,
-    SENSOR_FILTER_LIFE,
+    ATTR_HUMIDITY,
+    ATTR_TARGET_HUMIDITY,
+    SENSOR_HUMIDITY,
+    SENSOR_TARGET_HUMIDITY,
     WINIX_DATA_COORDINATOR,
 )
 from .device_wrapper import WinixDeviceWrapper
 from .manager import WinixEntity, WinixManager
 
 _LOGGER = logging.getLogger(__name__)
-TOTAL_FILTER_LIFE: Final = 6480  # 9 months
-
 
 SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
-        key=SENSOR_AIR_QVALUE,
-        icon="mdi:cloud",
-        name="Air QValue",
-        native_unit_of_measurement="qv",
-        state_class=SensorStateClass.MEASUREMENT,
-    ),
-    SensorEntityDescription(
-        key=SENSOR_FILTER_LIFE,
-        icon="mdi:air-filter",
-        name="Filter Life",
+        key=SENSOR_HUMIDITY,
+        icon="mdi:water-percent",
+        name="Current Humidity",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        key=SENSOR_AQI,
-        icon="mdi:blur",
-        name="AQI",
+        key=SENSOR_TARGET_HUMIDITY,
+        icon="mdi:target",
+        name="Target Humidity",
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
 )
@@ -65,7 +52,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ):
-    """Set up the Winix sensors."""
+    """Set up the Winix dehumidifier sensors."""
     data = hass.data[WINIX_DOMAIN][entry.entry_id]
     manager: WinixManager = data[WINIX_DATA_COORDINATOR]
 
@@ -79,7 +66,7 @@ async def async_setup_entry(
 
 
 class WinixSensor(WinixEntity, SensorEntity):
-    """Representation of a Winix Purifier sensor."""
+    """Representation of a Winix Dehumidifier sensor."""
 
     def __init__(
         self,
@@ -96,48 +83,17 @@ class WinixSensor(WinixEntity, SensorEntity):
         )
 
     @property
-    def extra_state_attributes(self) -> Mapping[str, Any] | None:
-        """Return the state attributes."""
-
-        attributes = None
-        if self.entity_description.key == SENSOR_AIR_QVALUE:
-            attributes = {ATTR_AIR_QUALITY: None}
-
-            state = self._wrapper.get_state()
-            if state is not None:
-                attributes[ATTR_AIR_QUALITY] = state.get(ATTR_AIR_QUALITY)
-
-        return attributes
-
-    @property
-    # pylint: disable=too-many-return-statements
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
         state = self._wrapper.get_state()
         if state is None:
             return None
 
-        if self.entity_description.key == SENSOR_AIR_QVALUE:
-            return state.get(ATTR_AIR_QVALUE)
+        if self.entity_description.key == SENSOR_HUMIDITY:
+            return state.get(ATTR_HUMIDITY)
 
-        if self.entity_description.key == SENSOR_AQI:
-            return state.get(ATTR_AIR_AQI)
-
-        if self.entity_description.key == SENSOR_FILTER_LIFE:
-            value = state.get(ATTR_FILTER_HOUR)
-            if value is None:
-                return None
-
-            hours: int = int(state.get(ATTR_FILTER_HOUR))
-            if hours > TOTAL_FILTER_LIFE:
-                _LOGGER.warning(
-                    "Reported filter life '%d' is more than max value '%d'",
-                    hours,
-                    TOTAL_FILTER_LIFE,
-                )
-                return None
-
-            return int((TOTAL_FILTER_LIFE - hours) * 100 / TOTAL_FILTER_LIFE)
+        if self.entity_description.key == SENSOR_TARGET_HUMIDITY:
+            return state.get(ATTR_TARGET_HUMIDITY)
 
         _LOGGER.error("Unhandled sensor '%s' encountered", self.entity_description.key)
         return None
