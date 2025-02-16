@@ -1,5 +1,3 @@
-"""Winix Air Purifier Device."""
-
 from __future__ import annotations
 
 import asyncio
@@ -25,18 +23,12 @@ from homeassistant.util.percentage import (
 )
 
 from .const import (
-    ATTR_AIRFLOW,
-    ATTR_FILTER_REPLACEMENT_DATE,
-    ATTR_LOCATION,
-    ATTR_POWER,
-    FAN_SERVICES,
+    ATTR_FAN_SPEED,
+    ATTR_TARGET_HUMIDITY,
+    ATTR_TIMER,
+    ATTR_CHILD_LOCK,
+    ATTR_UV_STERILIZATION,
     ORDERED_NAMED_FAN_SPEEDS,
-    PRESET_MODE_AUTO,
-    PRESET_MODE_AUTO_PLASMA_OFF,
-    PRESET_MODE_MANUAL,
-    PRESET_MODE_MANUAL_PLASMA_OFF,
-    PRESET_MODE_SLEEP,
-    PRESET_MODES,
     WINIX_DATA_COORDINATOR,
     WINIX_DATA_KEY,
     WINIX_DOMAIN,
@@ -52,11 +44,11 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ):
-    """Set up the Winix air purifiers."""
+    """Set up the Winix dehumidifiers."""
     data = hass.data[WINIX_DOMAIN][entry.entry_id]
     manager: WinixManager = data[WINIX_DATA_COORDINATOR]
     entities = [
-        WinixPurifier(wrapper, manager) for wrapper in manager.get_device_wrappers()
+        WinixDehumidifier(wrapper, manager) for wrapper in manager.get_device_wrappers()
     ]
     data[WINIX_DATA_KEY] = entities
     async_add_entities(entities)
@@ -66,9 +58,7 @@ async def async_setup_entry(
         method = "async_" + service_call.service
         _LOGGER.debug("Service '%s' invoked", service_call.service)
 
-        # The defined services do not accept any additional parameters
         params = {}
-
         entity_ids = service_call.data.get(ATTR_ENTITY_ID)
         if entity_ids:
             devices = [
@@ -90,27 +80,16 @@ async def async_setup_entry(
             )
 
         if state_update_tasks:
-            # Update device states in HA
             await asyncio.wait(state_update_tasks)
 
-    for service in FAN_SERVICES:
-        hass.services.async_register(
-            WINIX_DOMAIN,
-            service,
-            async_service_handler,
-            schema=vol.Schema({ATTR_ENTITY_ID: cv.entity_ids}),
-        )
-
-    _LOGGER.info("Added %s Winix fans", len(entities))
+    _LOGGER.info("Added %s Winix dehumidifiers", len(entities))
 
 
-class WinixPurifier(WinixEntity, FanEntity):
-    """Representation of a Winix Purifier entity."""
+class WinixDehumidifier(WinixEntity, FanEntity):
+    """Representation of a Winix Dehumidifier entity."""
 
-    # https://developers.home-assistant.io/docs/core/entity/fan/
     _attr_supported_features = (
-        FanEntityFeature.PRESET_MODE
-        | FanEntityFeature.SET_SPEED
+        FanEntityFeature.SET_SPEED
         | FanEntityFeature.TURN_ON
         | FanEntityFeature.TURN_OFF
     )
@@ -121,145 +100,82 @@ class WinixPurifier(WinixEntity, FanEntity):
         self._attr_unique_id = f"{FAN_DOMAIN}.{WINIX_DOMAIN}_{self._mac}"
 
     @property
-    def name(self) -> str | None:
-        """Entity Name.
-
-        Returning None, since this is the primary entity.
-        """
-        return None
-
-    @property
     def extra_state_attributes(self) -> Mapping[str, Any] | None:
         """Return the state attributes."""
         attributes = {}
         state = self._wrapper.get_state()
 
         if state is not None:
-            # The power attribute is the entity state, so skip it
             attributes = {
-                key: value for key, value in state.items() if key != ATTR_POWER
+                key: value for key, value in state.items()
             }
-
-        attributes[ATTR_LOCATION] = self._wrapper.device_stub.location_code
-        attributes[ATTR_FILTER_REPLACEMENT_DATE] = (
-            self._wrapper.device_stub.filter_replace_date
-        )
-
         return attributes
 
     @property
     def is_on(self) -> bool:
-        """Return true if switch is on."""
+        """Return true if dehumidifier is on."""
         return self._wrapper.is_on
 
     @property
     def percentage(self) -> int | None:
-        """Return the current speed percentage."""
+        """Return the current fan speed percentage."""
         state = self._wrapper.get_state()
         if state is None:
             return None
-        if self._wrapper.is_sleep or self._wrapper.is_auto:
+        if state.get(ATTR_FAN_SPEED) is None:
             return None
-        if state.get(ATTR_AIRFLOW) is None:
-            return None
-
         return ordered_list_item_to_percentage(
-            ORDERED_NAMED_FAN_SPEEDS, state.get(ATTR_AIRFLOW)
+            ORDERED_NAMED_FAN_SPEEDS, state.get(ATTR_FAN_SPEED)
         )
 
-    @property
-    def preset_mode(self) -> str | None:
-        """Return the current preset mode, e.g., auto, smart, interval, favorite."""
-        state = self._wrapper.get_state()
-        if state is None:
-            return None
-        if self._wrapper.is_sleep:
-            return PRESET_MODE_SLEEP
-        if self._wrapper.is_auto:
-            return (
-                PRESET_MODE_AUTO
-                if self._wrapper.is_plasma_on
-                else PRESET_MODE_AUTO_PLASMA_OFF
-            )
-        if self._wrapper.is_manual:
-            return (
-                PRESET_MODE_MANUAL
-                if self._wrapper.is_plasma_on
-                else PRESET_MODE_MANUAL_PLASMA_OFF
-            )
-
-        return None
-
-    @property
-    def preset_modes(self) -> list[str] | None:
-        """Return a list of available preset modes."""
-        return PRESET_MODES
-
-    @property
-    def speed_list(self) -> list:
-        """Get the list of available speeds."""
-        return ORDERED_NAMED_FAN_SPEEDS
-
-    @property
-    def speed_count(self) -> int:
-        """Return the number of speeds the fan supports."""
-        return len(ORDERED_NAMED_FAN_SPEEDS)
-
     async def async_set_percentage(self, percentage: int) -> None:
-        """Set the speed percentage of the fan."""
+        """Set the fan speed percentage."""
         if percentage == 0:
             await self.async_turn_off()
         else:
-            await self._wrapper.async_set_speed(
+            await self._wrapper.async_set_fan_speed(
                 percentage_to_ordered_list_item(ORDERED_NAMED_FAN_SPEEDS, percentage)
             )
-
         self.async_write_ha_state()
 
     async def async_turn_on(
         self,
         percentage: int | None = None,
-        preset_mode: str | None = None,
         **kwargs: Any,
     ) -> None:
-        # pylint: disable=unused-argument
-        """Turn on the purifier."""
-
+        """Turn on the dehumidifier."""
         if percentage:
             await self.async_set_percentage(percentage)
-        if preset_mode:
-            await self._wrapper.async_set_preset_mode(preset_mode)
         else:
             await self._wrapper.async_turn_on()
-
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        """Turn off the purifier."""
+        """Turn off the dehumidifier."""
         await self._wrapper.async_turn_off()
         self.async_write_ha_state()
 
-    async def async_plasmawave_on(self) -> None:
-        """Turn on plasma wave."""
-        await self._wrapper.async_plasmawave_on()
+    async def async_set_fan_speed(self, speed: str) -> None:
+        """Set the fan speed."""
+        await self._wrapper.async_set_fan_speed(speed)
         self.async_write_ha_state()
 
-    async def async_plasmawave_off(self) -> None:
-        """Turn off plasma wave."""
-        await self._wrapper.async_plasmawave_off()
+    async def async_set_target_humidity(self, humidity: int) -> None:
+        """Set the target humidity level."""
+        await self._wrapper.async_set_humidity(humidity)
         self.async_write_ha_state()
 
-    async def async_plasmawave_toggle(self) -> None:
-        """Toggle plasma wave."""
-
-        if self._wrapper.is_plasma_on:
-            await self._wrapper.async_plasmawave_off()
-        else:
-            await self._wrapper.async_plasmawave_on()
-
+    async def async_set_timer(self, timer: int) -> None:
+        """Set the timer."""
+        await self._wrapper.async_set_timer(timer)
         self.async_write_ha_state()
 
-    async def async_set_preset_mode(self, preset_mode: str) -> None:
-        """Set new preset mode."""
-        await self._wrapper.async_set_preset_mode(preset_mode)
+    async def async_set_child_lock(self, lock: bool) -> None:
+        """Enable or disable child lock."""
+        await self._wrapper.async_set_child_lock(lock)
+        self.async_write_ha_state()
+
+    async def async_set_uv_sterilization(self, uv: bool) -> None:
+        """Enable or disable UV sterilization."""
+        await self._wrapper.async_set_uv_sterilization(uv)
         self.async_write_ha_state()
