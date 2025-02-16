@@ -23,7 +23,7 @@ class WinixDriver:
     )
 
     category_keys = {
-        "power": "A02",
+        "power": "D02",
         "mode": "A03",
         "airflow": "A04",
         "aqi": "A05",
