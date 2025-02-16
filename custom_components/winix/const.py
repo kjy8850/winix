@@ -47,24 +47,21 @@ DEHUMIDIFIER_SERVICES: Final = [
     SERVICE_UV_STERILIZATION,
 ]
 
-# 팬 속도 정의
-FAN_SPEED_LOW: Final = "low"
-FAN_SPEED_MEDIUM: Final = "medium"
-FAN_SPEED_HIGH: Final = "high"
-FAN_SPEED_TURBO: Final = "turbo"
-FAN_SPEED_SILENT: Final = "silent"
+# 팬 속도 정의 (API에 맞게 조정)
+FAN_SPEED_HIGH: Final = "high"  # 강 (1)
+FAN_SPEED_LOW: Final = "low"  # 약 (2)
+FAN_SPEED_TURBO: Final = "turbo"  # 터보 (3)
 
 ORDERED_NAMED_FAN_SPEEDS: Final = [
-    FAN_SPEED_LOW,
-    FAN_SPEED_MEDIUM,
     FAN_SPEED_HIGH,
+    FAN_SPEED_LOW,
     FAN_SPEED_TURBO,
 ]
 
-# 제습기 운전 모드 (프리셋 모드는 제거)
-MODE_AUTO: Final = "auto"
-MODE_MANUAL: Final = "manual"
-MODE_LAUNDRY: Final = "laundry_dry"  # 의류 건조 모드
-MODE_SHOES: Final = "shoes_dry"  # 신발 건조 모드
-MODE_CONTINUOUS: Final = "continuous"  # 연속 제습 모드
-MODE_SILENT: Final = "silent"  # 저소음 모드
+# 제습기 운전 모드 (API에 맞게 조정)
+MODE_AUTO: Final = "auto"  # 자동 (1)
+MODE_MANUAL: Final = "manual"  # 수동 (2)
+MODE_LAUNDRY: Final = "laundry_dry"  # 의류 건조 (3)
+MODE_SHOES: Final = "shoes_dry"  # 신발 건조 (4)
+MODE_SILENT: Final = "silent"  # 저소음 (5)
+MODE_CONTINUOUS: Final = "continuous"  # 연속 (6)
