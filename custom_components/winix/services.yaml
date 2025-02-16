@@ -1,25 +1,64 @@
 # Describes the format of available services.
 
-plasmawave_on:
-  description: Turn on plasmawave.
+set_humidity:
+  description: Set the target humidity level.
   fields:
     entity_id:
-      description: Name(s) of Winix entities. Leave service data empty to use all Winix entities.
-      example: "fan.winix_living_room"
+      description: Name(s) of Winix dehumidifier entities. Leave service data empty to use all Winix entities.
+      example: "fan.winix_dehumidifier_living_room"
+    humidity:
+      description: Target humidity percentage.
+      example: 45
 
-plasmawave_off:
-  description: Turn off plasmawave.
+set_mode:
+  description: Set the operating mode.
   fields:
     entity_id:
-      description: Name(s) of Winix entities. Leave service data empty to use all Winix entities.
-      example: "fan.winix_living_room"
+      description: Name(s) of Winix dehumidifier entities. Leave service data empty to use all Winix entities.
+      example: "fan.winix_dehumidifier_living_room"
+    mode:
+      description: Operating mode (auto, manual, laundry_dry, shoes_dry, silent, continuous).
+      example: "auto"
 
-plasmawave_toggle:
-  description: Toggle plasmawave.
+set_fan_speed:
+  description: Set the fan speed.
   fields:
     entity_id:
-      description: Name(s) of Winix entities. Leave service data empty to use all Winix entities.
-      example: "fan.winix_living_room"
+      description: Name(s) of Winix dehumidifier entities. Leave service data empty to use all Winix entities.
+      example: "fan.winix_dehumidifier_living_room"
+    speed:
+      description: Fan speed level (low, high, turbo).
+      example: "high"
+
+set_timer:
+  description: Set the timer duration.
+  fields:
+    entity_id:
+      description: Name(s) of Winix dehumidifier entities. Leave service data empty to use all Winix entities.
+      example: "fan.winix_dehumidifier_living_room"
+    timer:
+      description: Timer duration in hours (0-12).
+      example: 6
+
+set_child_lock:
+  description: Enable or disable child lock.
+  fields:
+    entity_id:
+      description: Name(s) of Winix dehumidifier entities. Leave service data empty to use all Winix entities.
+      example: "fan.winix_dehumidifier_living_room"
+    lock:
+      description: Enable (true) or disable (false) child lock.
+      example: true
+
+set_uv_sterilization:
+  description: Enable or disable UV sterilization.
+  fields:
+    entity_id:
+      description: Name(s) of Winix dehumidifier entities. Leave service data empty to use all Winix entities.
+      example: "fan.winix_dehumidifier_living_room"
+    uv:
+      description: Enable (true) or disable (false) UV sterilization.
+      example: true
 
 remove_stale_entities:
   description: Remove Winix entities with unavailable state and associated devices.
