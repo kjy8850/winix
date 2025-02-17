@@ -1,12 +1,12 @@
 {
   "domain": "winix",
-  "name": "Winix Air Purifier",
+  "name": "Winix Dehumidifier",
   "documentation": "https://github.com/iprak/winix",
   "requirements": ["winix==0.2.1"],
   "dependencies": [],
   "codeowners": ["@iprak"],
   "issue_tracker": "https://github.com/iprak/winix/issues",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "config_flow": true,
   "iot_class": "cloud_polling"
 }
