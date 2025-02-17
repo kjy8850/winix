@@ -38,7 +38,7 @@ SERVICE_CHILD_LOCK: Final = "set_child_lock"  # 차일드락 기능 ON/OFF
 SERVICE_UV_STERILIZATION: Final = "set_uv_sterilization"  # UV 살균 기능 ON/OFF
 SERVICE_REMOVE_STALE_ENTITIES: Final = "remove_stale_entities"  # 불필요한 엔티티 제거
 
-FAN_SERVICES: Final = [
+HUMIDIFIER_SERVICES: Final = [
     SERVICE_SET_HUMIDITY,
     SERVICE_SET_MODE,
     SERVICE_SET_FAN_SPEED,
