@@ -24,6 +24,7 @@ from homeassistant.util.percentage import (
 
 from .const import (
     ATTR_FAN_SPEED,
+    ATTR_HUMIDITY,
     ATTR_TARGET_HUMIDITY,
     ATTR_TIMER,
     ATTR_CHILD_LOCK,
