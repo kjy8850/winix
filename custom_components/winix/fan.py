@@ -140,7 +140,6 @@ class WinixDehumidifier(WinixEntity, FanEntity):
 
     async def async_turn_on(
         self,
-        percentage: int | None = None,
         **kwargs: Any,
     ) -> None:
         """Turn on the dehumidifier."""
