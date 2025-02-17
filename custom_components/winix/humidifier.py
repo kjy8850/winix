@@ -30,7 +30,7 @@ from .const import (
     WINIX_DATA_COORDINATOR,
     WINIX_DATA_KEY,
     WINIX_DOMAIN,
-)
+) 
 from .device_wrapper import WinixDeviceWrapper
 from .manager import WinixEntity, WinixManager
 
