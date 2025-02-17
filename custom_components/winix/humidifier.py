@@ -83,7 +83,7 @@ async def async_setup_entry(
     _LOGGER.info("Added %s Winix dehumidifiers", len(entities))
 
 
-class WinixDehumidifier(WinixEntity, FanEntity):
+class WinixDehumidifier(WinixEntity, HumidifierEntity):
     """Representation of a Winix Dehumidifier entity."""
 
     _attr_supported_features = (
