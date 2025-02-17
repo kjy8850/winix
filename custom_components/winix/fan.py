@@ -104,11 +104,19 @@ class WinixDehumidifier(WinixEntity, FanEntity):
         """Return the state attributes."""
         attributes = {}
         state = self._wrapper.get_state()
-
+        
         if state is not None:
             attributes = {
                 key: value for key, value in state.items()
             }
+
+        
+        # current_humidity 값이 있는지 확인하는 로그 추가
+        if ATTR_HUMIDITY in state:
+            _LOGGER.debug("Winix current_humidity found: %s", state[ATTR_HUMIDITY])
+        else:
+            _LOGGER.warning("Winix current_humidity NOT found in state!")
+
         return attributes
 
     @property
