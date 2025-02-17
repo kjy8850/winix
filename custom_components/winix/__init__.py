@@ -23,7 +23,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from .const import (
-    FAN_SERVICES,
+    HUMIDIFIER_SERVICES,
     SERVICE_REMOVE_STALE_ENTITIES,
     WINIX_AUTH_RESPONSE,
     WINIX_DATA_COORDINATOR,
@@ -215,7 +215,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         # If this is the last loaded instance, then unregister services
         hass.services.async_remove(WINIX_DOMAIN, SERVICE_REMOVE_STALE_ENTITIES)
 
-        for service_name in FAN_SERVICES:
+        for service_name in HUMIDIFIER_SERVICES:
             hass.services.async_remove(WINIX_DOMAIN, service_name)
 
     return unload_ok
