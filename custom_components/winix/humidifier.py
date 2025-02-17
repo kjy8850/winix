@@ -10,6 +10,7 @@ import voluptuous as vol
 from homeassistant.components.humidifier import (
     DOMAIN as HUMIDIFIER_DOMAIN,
     HumidifierEntity,
+    HumidifierDeviceClass,
     HumidifierEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -17,10 +18,6 @@ from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.util.percentage import (
-    ordered_list_item_to_percentage,
-    percentage_to_ordered_list_item,
-)
 
 from .const import (
     ATTR_FAN_SPEED,
@@ -118,27 +115,19 @@ class WinixDehumidifier(WinixEntity, FanEntity):
         """Return true if dehumidifier is on."""
         return self._wrapper.is_on
 
-    @property
-    def percentage(self) -> int | None:
-        """Return the current fan speed percentage."""
-        state = self._wrapper.get_state()
-        if state is None:
-            return None
-        if state.get(ATTR_FAN_SPEED) is None:
-            return None
-        return ordered_list_item_to_percentage(
-            ORDERED_NAMED_FAN_SPEEDS, state.get(ATTR_FAN_SPEED)
-        )
+@property
+def target_humidity(self) -> int | None:
+    """Return the target humidity percentage set by the user."""
+    state = self._wrapper.get_state()
+    return state.get(ATTR_TARGET_HUMIDITY, None)  # 사용자가 설정한 목표 습도 값
 
-    async def async_set_percentage(self, percentage: int) -> None:
-        """Set the fan speed percentage."""
-        if percentage == 0:
-            await self.async_turn_off()
-        else:
-            await self._wrapper.async_set_fan_speed(
-                percentage_to_ordered_list_item(ORDERED_NAMED_FAN_SPEEDS, percentage)
-            )
+   async def async_set_humidity(self, humidity: int) -> None:
+    """Set the target humidity level."""
+    if 30 <= humidity <= 70:  # 습도 범위 제한 (필요시 조정)
+        await self._wrapper.async_set_humidity(humidity)
         self.async_write_ha_state()
+    else:
+        _LOGGER.warning("Invalid humidity value: %s (must be between 30-70)", humidity)
 
     async def async_turn_on(self, mode: str | None = None, humidity: int | None = None, **kwargs: Any) -> None:
         """Turn on the dehumidifier with optional mode and humidity."""
