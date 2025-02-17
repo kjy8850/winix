@@ -35,7 +35,7 @@ from .helpers import Helpers, WinixException
 from .manager import WinixManager
 
 _LOGGER = logging.getLogger(__name__)
-SUPPORTED_PLATFORMS = [Platform.FAN, Platform.SENSOR]
+SUPPORTED_PLATFORMS = [Platform.HUMIDIFIER, Platform.SENSOR]
 DEFAULT_SCAN_INTERVAL: Final = 30
 
 
