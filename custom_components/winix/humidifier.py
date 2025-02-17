@@ -12,7 +12,7 @@ from homeassistant.components.humidifier import (
     HumidifierEntity,
     HumidifierDeviceClass,
     HumidifierEntityFeature,
-)
+) 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant
