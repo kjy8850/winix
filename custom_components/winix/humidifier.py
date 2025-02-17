@@ -8,9 +8,9 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant.components.humidifier import (
-    DOMAIN as FAN_DOMAIN,
-    FanEntity,
-    FanEntityFeature,
+    DOMAIN as HUMIDIFIER_DOMAIN,
+    HumidifierEntity,
+    HumidifierEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ENTITY_ID
@@ -90,15 +90,15 @@ class WinixDehumidifier(WinixEntity, FanEntity):
     """Representation of a Winix Dehumidifier entity."""
 
     _attr_supported_features = (
-        FanEntityFeature.SET_SPEED
-        | FanEntityFeature.TURN_ON
-        | FanEntityFeature.TURN_OFF
+        HumidifierEntityFeature.SET_SPEED
+        | HumidifierEntityFeature.TURN_ON
+        | HumidifierEntityFeature.TURN_OFF
     )
 
     def __init__(self, wrapper: WinixDeviceWrapper, coordinator: WinixManager) -> None:
         """Initialize the entity."""
         super().__init__(wrapper, coordinator)
-        self._attr_unique_id = f"{FAN_DOMAIN}.{WINIX_DOMAIN}_{self._mac}"
+        self._attr_unique_id = f"{HUMIDIFIER_DOMAIN}.{WINIX_DOMAIN}_{self._mac}"
 
     @property
     def extra_state_attributes(self) -> Mapping[str, Any] | None:
