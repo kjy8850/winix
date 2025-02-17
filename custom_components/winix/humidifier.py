@@ -7,7 +7,7 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.components.fan import (
+from homeassistant.components.humidifier import (
     DOMAIN as FAN_DOMAIN,
     FanEntity,
     FanEntityFeature,
@@ -140,8 +140,13 @@ class WinixDehumidifier(WinixEntity, FanEntity):
             )
         self.async_write_ha_state()
 
-    async def async_turn_on(self, **kwargs: Any) -> None:
-        """Turn on the dehumidifier."""
+    async def async_turn_on(self, mode: str | None = None, humidity: int | None = None, **kwargs: Any) -> None:
+        """Turn on the dehumidifier with optional mode and humidity."""
+        if mode:
+            await self.async_set_mode(mode)
+        if humidity:
+            await self.async_set_humidity(humidity)
+
         await self._wrapper.async_turn_on()
         self.async_write_ha_state()
 
