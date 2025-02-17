@@ -8,7 +8,7 @@ from typing import Final
 
 from awesomeversion import AwesomeVersion
 from winix import auth
-
+ 
 from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
