@@ -64,6 +64,7 @@ class WinixDeviceWrapper:
             "%s: updated on=%s, target_humidity=%s, fan_speed=%s, timer=%s",
             self._alias,
             self._on,
+            self._state.get(ATTR_HUMIDITY),
             self._state.get(ATTR_TARGET_HUMIDITY),
             self._state.get(ATTR_MODE),
             self._state.get(ATTR_TIMER),
