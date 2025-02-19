@@ -15,6 +15,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_USERNAME,
     STATE_UNAVAILABLE,
+    ATTR_ENTITY_ID,
     Platform,
     __version__,
 )
