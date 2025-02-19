@@ -81,19 +81,27 @@ class WinixSensor(WinixEntity, SensorEntity):
         self._attr_unique_id = (
             f"{SENSOR_DOMAIN}.{WINIX_DOMAIN}_{description.key.lower()}_{self._mac}"
         )
-
+        
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
         state = self._wrapper.get_state()
+        _LOGGER.debug("Sensor State Data: %s", state)  # 현재 상태 전체 로그 출력
+
         if state is None:
+            _LOGGER.warning("State is None for sensor: %s", self.entity_description.key)
             return None
 
         if self.entity_description.key == SENSOR_HUMIDITY:
-            return state.get(ATTR_HUMIDITY)
+            humidity = state.get(ATTR_HUMIDITY)
+            _LOGGER.debug("    ├── Current Humidity Value: %s", humidity)  # 현재 습도 값 로그 출력
+            return humidity
 
         if self.entity_description.key == SENSOR_TARGET_HUMIDITY:
-            return state.get(ATTR_TARGET_HUMIDITY)
+            target_humidity = state.get(ATTR_TARGET_HUMIDITY)
+            _LOGGER.debug("    ├── Target Humidity Value: %s", target_humidity)  # 목표 습도 값 로그 출력
+            return target_humidity
 
-        _LOGGER.error("Unhandled sensor '%s' encountered", self.entity_description.key)
+        _LOGGER.error("    └── Unhandled sensor '%s' encountered", self.entity_description.key)
         return None
+
