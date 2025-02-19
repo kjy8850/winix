@@ -14,7 +14,7 @@ WINIX_AUTH_RESPONSE: Final = "WinixAuthResponse"
 WINIX_ACCESS_TOKEN_EXPIRATION: Final = "access_token_expiration"
 
 # 제습기 관련 속성 추가
-ATTR_HUMIDITY: Final = "humidity"  # 현재 습도
+ATTR_HUMIDITY: Final = "current_humidity"  # 현재 습도
 ATTR_TARGET_HUMIDITY: Final = "target_humidity"  # 목표 습도
 ATTR_MODE: Final = "mode"  # 운전 모드
 ATTR_FAN_SPEED: Final = "fan_speed"  # 팬 속도
@@ -23,7 +23,7 @@ ATTR_TIMER: Final = "timer"  # 타이머 설정
 ATTR_CHILD_LOCK: Final = "child_lock"  # 차일드락 기능
 ATTR_UV_STERILIZATION: Final = "uv_sterilization"  # UV 살균 기능
 
-SENSOR_HUMIDITY: Final = "current_humidity"
+SENSOR_HUMIDITY: Final = "humidity"
 SENSOR_TARGET_HUMIDITY: Final = "target_humidity"
 
 OFF_VALUE: Final = "off"
