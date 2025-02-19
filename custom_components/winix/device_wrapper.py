@@ -60,6 +60,8 @@ class WinixDeviceWrapper:
         self._state = await self._driver.get_state()
         self._on = self._state.get(ATTR_POWER) == ON_VALUE
         
+        self._logger.debug("%s: Full device state: %s", self._alias, self._state)  # 🔍 모든 데이터 출력
+
         self._logger.debug(
             "%s: updated on=%s, target_humidity=%s, fan_speed=%s, timer=%s",
             self._alias,
