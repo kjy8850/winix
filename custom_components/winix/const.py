@@ -23,7 +23,7 @@ ATTR_TIMER: Final = "timer"  # 타이머 설정
 ATTR_CHILD_LOCK: Final = "child_lock"  # 차일드락 기능
 ATTR_UV_STERILIZATION: Final = "uv_sterilization"  # UV 살균 기능
 
-SENSOR_HUMIDITY: Final = "humidity"
+SENSOR_HUMIDITY: Final = "current_humidity"
 SENSOR_TARGET_HUMIDITY: Final = "target_humidity"
 
 OFF_VALUE: Final = "off"
