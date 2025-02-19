@@ -146,6 +146,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[WINIX_DOMAIN][entry.entry_id] = {WINIX_DATA_COORDINATOR: manager}
     await hass.config_entries.async_forward_entry_setups(entry, SUPPORTED_PLATFORMS)
 
+    # 서비스 등록 추가
+    async_register_services(hass, manager)
+
     def remove_stale_entities(call: ServiceCall) -> None:
         """Remove stale entities."""
         device_registry = dr.async_get(hass)
@@ -180,6 +183,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     return True
 
+def async_register_services(hass: HomeAssistant, manager: WinixManager):
+    """Register services for Winix devices."""
+
+    async def service_handler(call: ServiceCall):
+        """Handle service calls."""
+        entity_ids = call.data.get(ATTR_ENTITY_ID, [])
+        service = call.service
+
+        devices = [
+            device for device in manager.get_device_wrappers() if device.entity_id in entity_ids
+        ] if entity_ids else manager.get_device_wrappers()
+
+        for device in devices:
+            if hasattr(device, f"async_{service}"):
+                await getattr(device, f"async_{service}")(**call.data)
+
+    for service in HUMIDIFIER_SERVICES:
+        hass.services.async_register(WINIX_DOMAIN, service, service_handler)
+
+    _LOGGER.info("Winix services registered: %s", ", ".join(HUMIDIFIER_SERVICES))
 
 @callback
 def async_remove(
