@@ -65,3 +65,12 @@ MODE_LAUNDRY: Final = "laundry_dry"  # 의류 건조 (3)
 MODE_SHOES: Final = "shoes_dry"  # 신발 건조 (4)
 MODE_SILENT: Final = "silent"  # 저소음 (5)
 MODE_CONTINUOUS: Final = "continuous"  # 연속 (6)
+
+PRESET_MODES: Final = [
+    MODE_AUTO,
+    MODE_MANUAL,
+    MODE_LAUNDRY,
+    MODE_SHOES,
+    MODE_SILENT,
+    MODE_CONTINUOUS,
+]
