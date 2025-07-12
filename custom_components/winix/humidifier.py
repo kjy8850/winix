@@ -31,6 +31,7 @@ from .const import (
     WINIX_DATA_COORDINATOR,
     WINIX_DATA_KEY,
     WINIX_DOMAIN,
+    PRESET_MODES,
 ) 
 from .device_wrapper import WinixDeviceWrapper
 from .manager import WinixEntity, WinixManager
