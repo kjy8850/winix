@@ -98,17 +98,17 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
         self._attr_unique_id = f"{HUMIDIFIER_DOMAIN}.{WINIX_DOMAIN}_{self._mac}"
 
 
-# 2. 현재 팬 모드 반환
-@property
-def fan_mode(self) -> str | None:
-    """Return the current fan speed (fan mode)."""
-    return self._wrapper.get_state().get("fan_speed")
+    # 2. 현재 팬 모드 반환
+    @property
+    def fan_mode(self) -> str | None:
+        """Return the current fan speed (fan mode)."""
+        return self._wrapper.get_state().get("fan_speed")
 
-# 3. 사용 가능한 팬 모드 목록
-@property
-def available_fan_modes(self) -> list[str] | None:
-    """Return list of supported fan speeds."""
-    return ["low", "medium", "high"]  # 실제 기기 기준으로 수정
+    # 3. 사용 가능한 팬 모드 목록
+    @property
+    def available_fan_modes(self) -> list[str] | None:
+        """Return list of supported fan speeds."""
+        return ["low", "medium", "high"]  # 실제 기기 기준으로 수정
 
     
     
