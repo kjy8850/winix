@@ -88,8 +88,7 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
     """Representation of a Winix Dehumidifier entity."""
 
     _attr_supported_features = (
-        HumidifierEntityFeature.TARGET_HUMIDITY
-        | HumidifierEntityFeature.MODE
+        HumidifierEntityFeature.MODE
     )
 
     def __init__(self, wrapper: WinixDeviceWrapper, coordinator: WinixManager) -> None:
