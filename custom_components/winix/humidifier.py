@@ -20,6 +20,7 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
+    ATTR_MODE,
     ATTR_FAN_SPEED,
     ATTR_HUMIDITY,
     ATTR_TARGET_HUMIDITY,
@@ -89,7 +90,6 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
     _attr_supported_features = (
         HumidifierEntityFeature.TARGET_HUMIDITY
         | HumidifierEntityFeature.MODE
-        | HumidifierEntityFeature.FAN_MODE
     )
 
     def __init__(self, wrapper: WinixDeviceWrapper, coordinator: WinixManager) -> None:
@@ -116,6 +116,29 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
         """Return true if dehumidifier is on."""
         return self._wrapper.is_on
 
+
+
+    
+    @property
+    def mode(self) -> str | None:
+        """Return the current mode."""
+        state = self._wrapper.get_state()
+        return state.get(ATTR_MODE)
+
+    @property
+    def available_modes(self) -> list[str]:
+        """Return available operation modes."""
+        return PRESET_MODES
+
+    async def async_set_mode(self, mode: str) -> None:
+        """Set the operation mode."""
+        await self._wrapper.async_set_mode(mode)
+        self.async_write_ha_state()
+
+
+
+
+    
     @property
     def target_humidity(self) -> int | None:
        """Return the target humidity percentage set by the user."""
