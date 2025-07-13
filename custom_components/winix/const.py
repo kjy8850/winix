@@ -59,12 +59,12 @@ ORDERED_NAMED_FAN_SPEEDS: Final = [
 ]
 
 # 제습기 운전 모드 (API에 맞게 조정)
-MODE_AUTO: Final = "자동"  # 자동 (1)
-MODE_MANUAL: Final = "수동"  # 수동 (2)
-MODE_LAUNDRY: Final = "의류_건조"  # 의류 건조 (3)
-MODE_SHOES: Final = "신발_건조"  # 신발 건조 (4)
-MODE_SILENT: Final = "저소음"  # 저소음 (5)
-MODE_CONTINUOUS: Final = "연속"  # 연속 (6)
+MODE_AUTO: Final = "auto"  # 자동 (1)
+MODE_MANUAL: Final = "manual"  # 수동 (2)
+MODE_LAUNDRY: Final = "laundry_dry"  # 의류 건조 (3)
+MODE_SHOES: Final = "shoes_dry"  # 신발 건조 (4)
+MODE_SILENT: Final = "silent"  # 저소음 (5)
+MODE_CONTINUOUS: Final = "continuous"  # 연속 (6)
 
 PRESET_MODES: Final = [
     MODE_AUTO,
@@ -74,3 +74,14 @@ PRESET_MODES: Final = [
     MODE_SILENT,
     MODE_CONTINUOUS,
 ]
+
+# UI 표시용 한글 라벨
+PRESET_MODE_LABELS: Final = {
+    MODE_AUTO: "자동",
+    MODE_MANUAL: "수동",
+    MODE_LAUNDRY: "의류 건조",
+    MODE_SHOES: "신발 건조",
+    MODE_SILENT: "저소음",
+    MODE_CONTINUOUS: "연속",
+}
+
