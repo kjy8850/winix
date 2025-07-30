@@ -158,12 +158,14 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
        return state.get(ATTR_TARGET_HUMIDITY, None)  # 사용자가 설정한 목표 습도 값
 
     async def async_set_humidity(self, target_humidity: int) -> None:
-       """Set the target humidity level."""
-       if 35 <= target_humidity <= 70:  # 습도 범위 제한 (필요시 조정)
-           await self._wrapper.async_set_humidity(target_humidity)
-           self.async_write_ha_state()
-       else:
-           _LOGGER.warning("Invalid humidity value: %s (must be between 35-70)", target_humidity)
+      if not (35 <= target_humidity <= 70):
+          _LOGGER.warning("Invalid humidity value: %s", target_humidity)
+          return
+      if target_humidity % 5 != 0:
+          _LOGGER.warning("Humidity must be set in 5%% steps. You passed: %s", target_humidity)
+          return
+      await self._wrapper.async_set_humidity(target_humidity)
+      self.async_write_ha_state()
 
     async def async_turn_on(self, mode: str | None = None, humidity: int | None = None, **kwargs: Any) -> None:
         """Turn on the dehumidifier with optional mode and humidity."""
