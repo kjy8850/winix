@@ -97,6 +97,18 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
         super().__init__(wrapper, coordinator)
         self._attr_unique_id = f"{HUMIDIFIER_DOMAIN}.{WINIX_DOMAIN}_{self._mac}"
 
+    @property
+    def min_humidity(self) -> int:
+        return 35
+
+    @property
+    def max_humidity(self) -> int:
+        return 70
+
+    @property
+    def humidity_step(self) -> int:
+        return 5
+
     
     @property
     def extra_state_attributes(self) -> Mapping[str, Any] | None:
@@ -147,11 +159,11 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
 
     async def async_set_humidity(self, target_humidity: int) -> None:
        """Set the target humidity level."""
-       if 30 <= target_humidity <= 70:  # 습도 범위 제한 (필요시 조정)
+       if 35 <= target_humidity <= 70:  # 습도 범위 제한 (필요시 조정)
            await self._wrapper.async_set_humidity(target_humidity)
            self.async_write_ha_state()
        else:
-           _LOGGER.warning("Invalid humidity value: %s (must be between 30-70)", target_humidity)
+           _LOGGER.warning("Invalid humidity value: %s (must be between 35-70)", target_humidity)
 
     async def async_turn_on(self, mode: str | None = None, humidity: int | None = None, **kwargs: Any) -> None:
         """Turn on the dehumidifier with optional mode and humidity."""
