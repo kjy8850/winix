@@ -106,22 +106,54 @@ class WinixDriver:
         raw_resp = await resp.text()
         _LOGGER.debug("_rpc_attr response=%s", raw_resp)
 
-    async def get_state(self) -> dict[str, str]:
+ async def get_state(self) -> dict[str, str]:
         """Get device state."""
         response = await self._client.get(
             self.STATE_URL.format(deviceid=self.device_id)
         )
         json = await response.json()
 
-        output = {}
+        output: dict[str, str] = {}
+
+        # ###-------- Winix 응답 방어 로직 추가 --------###
         try:
-            _LOGGER.debug(json)
-            payload = json["body"]["data"][0]["attributes"]
-        except Exception as err:
+            _LOGGER.debug("Winix raw state response: %s", json)
+
+            # body 키가 없을 수도 있으므로 get 사용
+            body = json.get("body") or {}
+
+            # data 키가 없거나 빈 리스트일 수 있음
+            data = body.get("data")
+            if not data:
+                # 겨울철 등으로 서버가 'no data' 를 보낼 때 여기로 들어옴
+                _LOGGER.warning(
+                    "Winix API returned no data for device %s: %s",
+                    self.device_id,
+                    json,
+                )
+                return output
+
+            # data[0]에 attributes 키가 없을 수도 있으므로 get 사용
+            payload = data[0].get("attributes", {})
+
+        except Exception as err:  # 예외가 생기더라도 HA 전체가 죽지 않도록 방어
             _LOGGER.error(
                 "Error parsing response json, received %s", json, exc_info=err
             )
             return output
+
+        # ###-------- 기존 파싱 로직 --------###
+        for payload_key, attribute in payload.items():
+            for category, local_key in self.category_keys.items():
+                if payload_key == local_key:
+                    if category in self.state_keys:
+                        for value_key, value in self.state_keys[category].items():
+                            if attribute == value:
+                                output[category] = value_key
+                    else:
+                        output[category] = int(attribute)
+
+        return output
 
         for payload_key, attribute in payload.items():
             for category, local_key in self.category_keys.items():
