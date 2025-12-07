@@ -106,7 +106,7 @@ class WinixDriver:
         raw_resp = await resp.text()
         _LOGGER.debug("_rpc_attr response=%s", raw_resp)
 
- async def get_state(self) -> dict[str, str]:
+    async def get_state(self) -> dict[str, str]:
         """Get device state."""
         response = await self._client.get(
             self.STATE_URL.format(deviceid=self.device_id)
