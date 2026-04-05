@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-import logging
 from typing import Any
 
 import voluptuous as vol
@@ -13,10 +12,8 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.data_entry_flow import FlowResult
 
-from .const import WINIX_AUTH_RESPONSE, WINIX_DOMAIN, WINIX_NAME
+from .const import LOGGER, WINIX_AUTH_RESPONSE, WINIX_DOMAIN, WINIX_NAME
 from .helpers import Helpers, WinixException
-
-_LOGGER = logging.getLogger(__name__)
 
 REAUTH_SCHEMA = vol.Schema({vol.Required(CONF_PASSWORD): str})
 
@@ -44,6 +41,8 @@ class WinixFlowHandler(config_entries.ConfigFlow, domain=WINIX_DOMAIN):
         except WinixException as err:
             if err.result_code == "UserNotFoundException":
                 return {"errors": {"base": "invalid_user"}, WINIX_AUTH_RESPONSE: None}
+
+            LOGGER.error("Unexpected error during authentication: %s", err)
 
             return {
                 "errors": {"base": "invalid_auth"},
