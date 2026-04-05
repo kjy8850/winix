@@ -1,6 +1,7 @@
 """Constants for the Winix Dehumidifier component."""
 
 from enum import Enum, unique
+import logging
 from typing import Final
 
 __min_ha_version__ = "2024.8"
