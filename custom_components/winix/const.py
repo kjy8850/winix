@@ -5,6 +5,8 @@ from typing import Final
 
 __min_ha_version__ = "2024.8"
 
+LOGGER = logging.getLogger(__package__)
+
 WINIX_DOMAIN: Final = "winix"  # WINIX 도메인 유지
 
 WINIX_NAME: Final = "Winix Dehumidifier"  # 이름만 제습기로 변경
