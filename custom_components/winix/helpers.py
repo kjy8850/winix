@@ -18,7 +18,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 
 from .const import (
-    DEFAULT_POST_TIMEOUT,
     LOGGER,
     WINIX_DOMAIN,
 )
