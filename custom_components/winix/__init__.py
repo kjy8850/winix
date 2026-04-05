@@ -40,7 +40,7 @@ from .manager import WinixManager
 
 type WinixConfigEntry = ConfigEntry[WinixManager]
 
-SUPPORTED_PLATFORMS = [Platform.Humidifier, Platform.SENSOR, Platform.SELECT, Platform.SWITCH]
+SUPPORTED_PLATFORMS = [Platform.HUMIDIFIER, Platform.SENSOR, Platform.SELECT, Platform.SWITCH]
 DEFAULT_SCAN_INTERVAL: Final = 30
 
 
