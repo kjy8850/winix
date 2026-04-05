@@ -1,7 +1,7 @@
 {
   "domain": "winix",
   "name": "Winix Dehumidifier",
-  "documentation": "https://github.com/kjy8850/winix",
+  "documentation": "https://github.com/iprak/winix",
   "requirements": [
   "winix==0.3.0",
   "pycryptodome==3.23.0"
