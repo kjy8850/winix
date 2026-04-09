@@ -72,6 +72,10 @@ class WinixDeviceWrapper:
             self._state.get(ATTR_TIMER),
         )
 
+    def update_features(self) -> None:
+        """제습기는 별도 feature 업데이트 없음."""
+        pass
+    
     def get_state(self) -> dict[str, str]:
         """Return the device data."""
         return self._state
@@ -130,7 +134,3 @@ class WinixDeviceWrapper:
         self._state[ATTR_UV_STERILIZATION] = ON_VALUE if uv else OFF_VALUE
         self._logger.debug("%s => set UV sterilization=%s", self._alias, uv)
         await self._driver.set_uv_sterilization(uv)
-
-def update_features(self) -> None:
-    """제습기는 별도 feature 업데이트 없음."""
-    pass
