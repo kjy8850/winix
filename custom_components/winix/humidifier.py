@@ -45,44 +45,11 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ):
     """Set up the Winix dehumidifiers."""
-    data = hass.data[WINIX_DOMAIN][entry.entry_id]
-    manager: WinixManager = data[WINIX_DATA_COORDINATOR]
+    manager: WinixManager = entry.runtime_data
     entities = [
         WinixDehumidifier(wrapper, manager) for wrapper in manager.get_device_wrappers()
     ]
-    data[WINIX_DATA_KEY] = entities
     async_add_entities(entities)
-
-    async def async_service_handler(service_call):
-        """Service handler."""
-        method = "async_" + service_call.service
-        _LOGGER.debug("Service '%s' invoked", service_call.service)
-
-        params = {}
-        entity_ids = service_call.data.get(ATTR_ENTITY_ID)
-        if entity_ids:
-            devices = [
-                entity
-                for entity in data[WINIX_DATA_KEY]
-                if entity.entity_id in entity_ids
-            ]
-        else:
-            devices = data[WINIX_DATA_KEY]
-
-        state_update_tasks = []
-        for device in devices:
-            if not hasattr(device, method):
-                continue
-
-            await getattr(device, method)(**params)
-            state_update_tasks.append(
-                asyncio.create_task(device.async_update_ha_state(True))
-            )
-
-        if state_update_tasks:
-            await asyncio.wait(state_update_tasks)
-
-    _LOGGER.info("Added %s Winix dehumidifiers", len(entities))
 
 
 class WinixDehumidifier(WinixEntity, HumidifierEntity):
