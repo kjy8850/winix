@@ -1,3 +1,5 @@
+"""Winix Dehumidifier Device."""
+
 from __future__ import annotations
 
 import asyncio
@@ -5,20 +7,17 @@ from collections.abc import Mapping
 import logging
 from typing import Any
 
-import voluptuous as vol
-
 from homeassistant.components.humidifier import (
     DOMAIN as HUMIDIFIER_DOMAIN,
     HumidifierEntity,
     HumidifierDeviceClass,
     HumidifierEntityFeature,
-) 
-from homeassistant.config_entries import ConfigEntry
+)
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from . import WinixConfigEntry
 from .const import (
     ATTR_MODE,
     ATTR_FAN_SPEED,
@@ -27,37 +26,33 @@ from .const import (
     ATTR_TIMER,
     ATTR_CHILD_LOCK,
     ATTR_UV_STERILIZATION,
+    LOGGER,
     ORDERED_NAMED_FAN_SPEEDS,
-    WINIX_DATA_COORDINATOR,
-    WINIX_DATA_KEY,
     WINIX_DOMAIN,
     PRESET_MODES,
-) 
+)
 from .device_wrapper import WinixDeviceWrapper
 from .manager import WinixEntity, WinixManager
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: WinixConfigEntry,
     async_add_entities: AddEntitiesCallback,
-):
+) -> None:
     """Set up the Winix dehumidifiers."""
-    manager: WinixManager = entry.runtime_data
+    manager = entry.runtime_data
     entities = [
         WinixDehumidifier(wrapper, manager) for wrapper in manager.get_device_wrappers()
     ]
     async_add_entities(entities)
+    LOGGER.info("Added %s Winix dehumidifiers", len(entities))
 
 
 class WinixDehumidifier(WinixEntity, HumidifierEntity):
     """Representation of a Winix Dehumidifier entity."""
 
-    _attr_supported_features = (
-        HumidifierEntityFeature.MODES
-    )
+    _attr_supported_features = HumidifierEntityFeature.MODES
 
     def __init__(self, wrapper: WinixDeviceWrapper, coordinator: WinixManager) -> None:
         """Initialize the entity."""
@@ -76,32 +71,26 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
     def humidity_step(self) -> int:
         return 5
 
-    
     @property
     def extra_state_attributes(self) -> Mapping[str, Any] | None:
         """Return the state attributes."""
         attributes = {}
-        state = self._wrapper.get_state()
-        
+        state = self.device_wrapper.get_state()
+
         if state is not None:
-            attributes = {
-                key: value for key, value in state.items()
-            }
+            attributes = {key: value for key, value in state.items()}
 
         return attributes
 
     @property
     def is_on(self) -> bool:
         """Return true if dehumidifier is on."""
-        return self._wrapper.is_on
+        return self.device_wrapper.is_on
 
-
-
-    
     @property
     def mode(self) -> str | None:
         """Return the current mode."""
-        state = self._wrapper.get_state()
+        state = self.device_wrapper.get_state()
         return state.get(ATTR_MODE)
 
     @property
@@ -109,30 +98,27 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
         """Return available operation modes."""
         return PRESET_MODES
 
-    async def async_set_mode(self, mode: str) -> None:
-        """Set the operation mode."""
-        await self._wrapper.async_set_mode(mode)
-        self.async_write_ha_state()
-
-
-
-
-    
     @property
     def target_humidity(self) -> int | None:
-       """Return the target humidity percentage set by the user."""
-       state = self._wrapper.get_state()
-       return state.get(ATTR_TARGET_HUMIDITY, None)  # 사용자가 설정한 목표 습도 값
+        """Return the target humidity percentage set by the user."""
+        state = self.device_wrapper.get_state()
+        return state.get(ATTR_TARGET_HUMIDITY, None)
 
-    async def async_set_humidity(self, target_humidity: int) -> None:
-      if not (35 <= target_humidity <= 70):
-          _LOGGER.warning("Invalid humidity value: %s", target_humidity)
-          return
-      if target_humidity % 5 != 0:
-          _LOGGER.warning("Humidity must be set in 5%% steps. You passed: %s", target_humidity)
-          return
-      await self._wrapper.async_set_humidity(target_humidity)
-      self.async_write_ha_state()
+    async def async_set_mode(self, mode: str) -> None:
+        """Set the operation mode."""
+        await self.device_wrapper.async_set_mode(mode)
+        self.async_write_ha_state()
+
+    async def async_set_humidity(self, humidity: int) -> None:
+        """Set the target humidity level."""
+        if not (35 <= humidity <= 70):
+            LOGGER.warning("Invalid humidity value: %s", humidity)
+            return
+        if humidity % 5 != 0:
+            LOGGER.warning("Humidity must be set in 5%% steps. You passed: %s", humidity)
+            return
+        await self.device_wrapper.async_set_humidity(humidity)
+        self.async_write_ha_state()
 
     async def async_turn_on(self, mode: str | None = None, humidity: int | None = None, **kwargs: Any) -> None:
         """Turn on the dehumidifier with optional mode and humidity."""
@@ -140,36 +126,30 @@ class WinixDehumidifier(WinixEntity, HumidifierEntity):
             await self.async_set_mode(mode)
         if humidity:
             await self.async_set_humidity(humidity)
-
-        await self._wrapper.async_turn_on()
+        await self.device_wrapper.async_turn_on()
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the dehumidifier."""
-        await self._wrapper.async_turn_off()
+        await self.device_wrapper.async_turn_off()
         self.async_write_ha_state()
 
     async def async_set_fan_speed(self, speed: str) -> None:
         """Set the fan speed."""
-        await self._wrapper.async_set_fan_speed(speed)
-        self.async_write_ha_state()
-
-    async def async_set_target_humidity(self, humidity: int) -> None:
-        """Set the target humidity level."""
-        await self._wrapper.async_set_humidity(humidity)
+        await self.device_wrapper.async_set_fan_speed(speed)
         self.async_write_ha_state()
 
     async def async_set_timer(self, timer: int) -> None:
         """Set the timer."""
-        await self._wrapper.async_set_timer(timer)
+        await self.device_wrapper.async_set_timer(timer)
         self.async_write_ha_state()
 
     async def async_set_child_lock(self, lock: bool) -> None:
         """Enable or disable child lock."""
-        await self._wrapper.async_set_child_lock(lock)
+        await self.device_wrapper.async_set_child_lock(lock)
         self.async_write_ha_state()
 
     async def async_set_uv_sterilization(self, uv: bool) -> None:
         """Enable or disable UV sterilization."""
-        await self._wrapper.async_set_uv_sterilization(uv)
+        await self.device_wrapper.async_set_uv_sterilization(uv)
         self.async_write_ha_state()
