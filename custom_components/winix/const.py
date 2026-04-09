@@ -88,3 +88,8 @@ PRESET_MODE_LABELS: Final = {
     MODE_CONTINUOUS: "연속",
 }
 
+# 네트워크 요청 타임아웃
+DEFAULT_POST_TIMEOUT: Final = 10
+
+# 필터 알람 기본값 (개월)
+DEFAULT_FILTER_ALARM_DURATION: Final = 9
