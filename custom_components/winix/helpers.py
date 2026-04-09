@@ -17,10 +17,14 @@ from winix import WinixAccount, auth
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 
+# 수정 후
 from .const import (
+    DEFAULT_FILTER_ALARM_DURATION,
+    DEFAULT_POST_TIMEOUT,
     LOGGER,
     WINIX_DOMAIN,
 )
+
 from .device_wrapper import MyWinixDeviceStub
 
 HEADERS = {
