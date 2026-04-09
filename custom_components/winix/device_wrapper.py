@@ -130,3 +130,7 @@ class WinixDeviceWrapper:
         self._state[ATTR_UV_STERILIZATION] = ON_VALUE if uv else OFF_VALUE
         self._logger.debug("%s => set UV sterilization=%s", self._alias, uv)
         await self._driver.set_uv_sterilization(uv)
+
+def update_features(self) -> None:
+    """제습기는 별도 feature 업데이트 없음."""
+    pass
